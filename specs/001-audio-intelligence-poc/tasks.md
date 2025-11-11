@@ -16,6 +16,7 @@
 ## Path Conventions
 
 Single Python package structure at repository root:
+
 - `audio_intelligence/` - Main package
 - `audio_intelligence/cli/` - Command-line interface
 - Supporting files at root level
@@ -26,12 +27,12 @@ Single Python package structure at repository root:
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create audio_intelligence/ package directory structure with __init__.py
+- [ ] T001 Create audio_intelligence/ package directory structure with **init**.py
 - [ ] T002 Create requirements.txt with dependencies: librosa>=0.10.0, soundfile>=0.12.0, sounddevice>=0.4.6, numpy>=1.24.0, scipy>=1.10.0, agent-framework-azure-ai, click>=8.1.0, rich>=13.0.0, pytest>=7.4.0
 - [ ] T003 Create setup.py for package installation with entry point for audio-intelligence CLI command
 - [ ] T004 [P] Create README.md with quick start guide based on quickstart.md
 - [ ] T005 [P] Create GETTING_STARTED.md with detailed usage documentation
-- [ ] T006 [P] Create .gitignore for Python project (venv/, __pycache__/, *.pyc, events/, *.wav)
+- [ ] T006 [P] Create .gitignore for Python project (venv/, **pycache**/, *.pyc, events/,*.wav)
 
 ---
 
@@ -41,8 +42,8 @@ Single Python package structure at repository root:
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T007 Create audio_intelligence/__init__.py with package exports (AudioAnalyzer, EnvironmentListener, AudioAgent)
-- [ ] T008 Create audio_intelligence/cli/__init__.py with Click group and main() entry point
+- [ ] T007 Create audio_intelligence/**init**.py with package exports (AudioAnalyzer, EnvironmentListener, AudioAgent)
+- [ ] T008 Create audio_intelligence/cli/**init**.py with Click group and main() entry point
 - [ ] T009 [P] Create data model classes in audio_intelligence/models.py: ListeningSession, AcousticEvent, AudioAnalysisResult, FeatureVector with all attributes from data-model.md. Use Python dataclasses (@dataclass decorator) with type hints for attributes only, no business logic methods (POC-first approach)
 - [ ] T010 [P] Create audio_intelligence/utils.py with helper functions: validate_file_size, check_audio_device_permissions, format_error_message
 - [ ] T011 Create audio_intelligence/config.py for configuration management: environment variables (GITHUB_TOKEN, AUDIO_INTELLIGENCE_OUTPUT_DIR, AUDIO_INTELLIGENCE_DEVICE, AUDIO_INTELLIGENCE_LOG_LEVEL), default values
@@ -65,14 +66,14 @@ Single Python package structure at repository root:
 
 ### Implementation for User Story 1
 
-- [ ] T013 [P] [US1] Create audio_intelligence/listener.py with EnvironmentListener class skeleton: __init__, start_session, stop_session, _audio_callback methods
+- [ ] T013 [P] [US1] Create audio_intelligence/listener.py with EnvironmentListener class skeleton: **init**, start_session, stop_session,_audio_callback methods
 - [ ] T014 [US1] Implement baseline calibration in EnvironmentListener._establish_baseline() using first 10 audio chunks to compute baseline RMS and spectral centroid
 - [ ] T015 [US1] Implement real-time audio capture in EnvironmentListener.start_session() using sounddevice.InputStream with configurable chunk size (0.5-2s), sample rate detection, callback registration
 - [ ] T016 [US1] Implement event detection in EnvironmentListener._audio_callback(): extract RMS energy and spectral centroid using librosa, compare to baseline values from T014 using dB difference for RMS and Hz difference for centroid, check against configurable thresholds
 - [ ] T017 [US1] Implement event creation and callback in EnvironmentListener._detect_events(): create AcousticEvent objects for VOLUME_INCREASE, VOLUME_DECREASE, FREQUENCY_SHIFT with timestamps and magnitude
 - [ ] T018 [US1] Implement optional event recording in EnvironmentListener._save_event_clip(): save 2-second WAV clips to output directory when recording_enabled=True
 - [ ] T019 [US1] Implement session summary generation in EnvironmentListener.stop_session(): aggregate events by type, save session JSON summary with all session metadata
-- [ ] T020 [US1] Implement listen command in audio_intelligence/cli/__init__.py: parse CLI arguments (duration, output-dir, record-events, volume-threshold, frequency-threshold, chunk-size, device, list-devices), create EnvironmentListener, display live updates using rich console
+- [ ] T020 [US1] Implement listen command in audio_intelligence/cli/**init**.py: parse CLI arguments (duration, output-dir, record-events, volume-threshold, frequency-threshold, chunk-size, device, list-devices), create EnvironmentListener, display live updates using rich console
 - [ ] T021 [US1] Add error handling for missing microphone permissions (FR-019): check device availability before starting session, display actionable error message with OS-specific instructions
 - [ ] T022 [US1] Add memory management in EnvironmentListener._audio_callback(): explicitly release chunk buffers after processing to prevent memory accumulation (FR-021)
 - [ ] T023 [US1] Update test_sanity.py with test_listener_basic_workflow(): mock sounddevice, create listener, simulate baseline and event detection with synthetic audio chunks
@@ -94,14 +95,14 @@ Single Python package structure at repository root:
 
 ### Implementation for User Story 2
 
-- [ ] T026 [P] [US2] Create audio_intelligence/analyzer.py with AudioAnalyzer class skeleton: __init__, analyze_file, _extract_basic_features, _extract_advanced_features, _detect_anomalies methods
+- [ ] T026 [P] [US2] Create audio_intelligence/analyzer.py with AudioAnalyzer class skeleton: **init**, analyze_file, _extract_basic_features,_extract_advanced_features, _detect_anomalies methods
 - [ ] T027 [US2] Implement file validation in AudioAnalyzer.analyze_file(): check file exists, check file size < 2GB (FR-022), validate format (WAV/MP3/FLAC) using librosa, display clear error for unsupported formats (FR-020)
 - [ ] T028 [US2] Implement basic feature extraction in AudioAnalyzer._extract_basic_features(): load audio with librosa.load(sr=None), compute RMS energy, peak amplitude, frequency spectrum (FFT), spectral centroid, zero crossing rate
 - [ ] T029 [US2] Implement advanced feature extraction in AudioAnalyzer._extract_advanced_features(): compute MFCCs (13 coefficients), chroma features (12 pitch classes), spectral contrast (7 bands), spectral rolloff, spectral bandwidth using librosa.feature.*
 - [ ] T030 [US2] Implement anomaly detection in AudioAnalyzer._detect_anomalies(): detect CLIPPING (samples > 0.99), DC_OFFSET (non-zero mean), SILENCE (extended low RMS periods), DYNAMIC_RANGE_LOW/HIGH, create Anomaly objects with type, severity, time range, description
 - [ ] T031 [US2] Implement memory-efficient processing in AudioAnalyzer.analyze_file(): use process-and-release pattern for large files, avoid storing entire audio in memory after processing
-- [ ] T032 [US2] Implement analyze command in audio_intelligence/cli/__init__.py: parse CLI arguments (file, output, format, ai/no-ai, interactive), create AudioAnalyzer, display results using rich tables for text format or JSON export
-- [ ] T033 [US2] Implement batch command in audio_intelligence/cli/__init__.py: parse file pattern/glob, iterate files, call analyzer for each, handle corrupted files with continue-on-error (FR-020), display aggregated summary
+- [ ] T032 [US2] Implement analyze command in audio_intelligence/cli/**init**.py: parse CLI arguments (file, output, format, ai/no-ai, interactive), create AudioAnalyzer, display results using rich tables for text format or JSON export
+- [ ] T033 [US2] Implement batch command in audio_intelligence/cli/**init**.py: parse file pattern/glob, iterate files, call analyzer for each, handle corrupted files with continue-on-error (FR-020), display aggregated summary
 - [ ] T034 [US2] Add test_feature_extraction() to test_sanity.py: verify basic features present in output (rms_energy, spectral_centroid, peak_amplitude)
 - [ ] T035 [US2] Add test_anomaly_detection() to test_sanity.py: create test file with clipping (samples at 1.0), run analyzer, verify CLIPPING anomaly detected
 
@@ -121,9 +122,9 @@ Single Python package structure at repository root:
 
 ### Implementation for User Story 3
 
-- [ ] T037 [P] [US3] Create audio_intelligence/agent.py with AudioAgent class skeleton: __init__, analyze_features, interactive_session, _create_feature_vector methods
+- [ ] T037 [P] [US3] Create audio_intelligence/agent.py with AudioAgent class skeleton: **init**, analyze_features, interactive_session,_create_feature_vector methods
 - [ ] T038 [US3] Implement feature vector creation in AudioAgent._create_feature_vector(): compress AudioAnalysisResult or ListeningSession to FeatureVector with SummaryStats, 8 frequency bands, TemporalPattern, ensure size < 1KB (FR-014)
-- [ ] T039 [US3] Implement AI integration in AudioAgent.__init__(): conditional import of agent-framework-azure-ai with try/except for graceful degradation, initialize with GITHUB_TOKEN from environment, use phi-4-mini-instruct model via GitHub Models endpoint
+- [ ] T039 [US3] Implement AI integration in AudioAgent.**init**(): conditional import of agent-framework-azure-ai with try/except for graceful degradation, initialize with GITHUB_TOKEN from environment, use phi-4-mini-instruct model via GitHub Models endpoint
 - [ ] T040 [US3] Implement AI analysis in AudioAgent.analyze_features(): create FeatureVector from analysis result, send to AI agent with prompt "Analyze these audio features and provide insights", handle API errors (invalid token, quota exceeded) with warning message (FR-023), return insights string or None
 - [ ] T041 [US3] Implement interactive mode in AudioAgent.interactive_session(): create REPL loop, accept user questions, query AI agent with context (analysis results + question), display AI responses, support commands (help, summary, export, exit/quit)
 - [ ] T042 [US3] Integrate AI insights into analyze command: call AudioAgent.analyze_features() after analysis, display AI insights section in terminal output, handle graceful degradation when AI unavailable
@@ -139,7 +140,7 @@ Single Python package structure at repository root:
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T046 [P] Add global CLI options in audio_intelligence/cli/__init__.py: --help, --version (display version + Python + librosa + sounddevice versions), --quiet (suppress non-essential output), --verbose (enable DEBUG logging)
+- [ ] T046 [P] Add global CLI options in audio_intelligence/cli/**init**.py: --help, --version (display version + Python + librosa + sounddevice versions), --quiet (suppress non-essential output), --verbose (enable DEBUG logging)
 - [ ] T047 [P] Implement rich terminal formatting across all CLI commands: use rich.console for progress indicators, use rich.table for structured output, use rich.panel for sections, add emoji icons for event types
 - [ ] T048 [P] Add comprehensive error messages for all failure modes: format_error_message utility for consistent styling, include remediation steps for common issues (permissions, file size, AI token, corrupted files)
 - [ ] T049 [P] Create demo_listening.py at repository root: simple script demonstrating listening session with event detection, can be run for quick demo (< 1 minute)
@@ -180,18 +181,22 @@ Single Python package structure at repository root:
 ### Parallel Opportunities
 
 **Phase 1 (Setup)**: Can run in parallel:
+
 - T004 (README.md), T005 (GETTING_STARTED.md), T006 (.gitignore)
 
 **Phase 2 (Foundational)**: Can run in parallel:
+
 - T009 (models.py) and T010 (utils.py) - different files
 
 **Phase 3 (User Story 1)**: Within the story:
+
 - T013 (listener.py skeleton) must complete first
 - Then T014-T019 have some dependencies (baseline before detection, detection before recording)
 - T020-T022 (CLI integration and error handling) can start once core listener works
 - T012 (test) and T023 (test update) can be written anytime
 
 **Phase 4 (User Story 2)**: Can run in parallel:
+
 - T024, T025 (tests) - independent
 - T026 (analyzer.py skeleton) must complete first
 - T027-T031 (analysis implementation) have some sequential dependencies
@@ -199,16 +204,19 @@ Single Python package structure at repository root:
 - T034-T035 (more tests) anytime
 
 **Phase 5 (User Story 3)**: Can run in parallel:
+
 - T036 (test) - independent
 - T037 (agent.py skeleton) must complete first
 - T038-T041 (agent implementation) mostly sequential
 - T042-T045 (integration) once agent works
 
 **Phase 6 (Polish)**: Most tasks can run in parallel:
+
 - T046, T047, T048, T049, T050, T052, T053 - all different concerns
 - T051 (finalize tests), T054 (validate quickstart), T055 (exit codes) - slightly dependent on earlier work
 
 **User Story Parallelization**: If multiple developers available:
+
 - Developer A: Complete US1 (T012-T023) - Real-time monitoring MVP
 - Developer B: Complete US2 (T024-T035) - File analysis (can start after Phase 2)
 - Developer C: Complete US3 (T036-T045) - AI insights (can start after Phase 2)
@@ -301,6 +309,7 @@ Per Constitution Principle III, tests focus on happy path only:
 - **Run before commit**: `pytest audio_intelligence/test_sanity.py -v`
 
 **Test Coverage by Story**:
+
 - US1 (Real-time): 2 tests (imports, basic workflow)
 - US2 (File analysis): 4 tests (imports, workflow, features, anomalies)
 - US3 (AI): 1 test (graceful degradation)
@@ -370,12 +379,14 @@ Tasks mapped to success criteria from spec.md:
 **First task to start**: T001 - Create audio_intelligence/ package directory structure
 
 **First validation point**: After T011 (Foundational complete) - verify imports work:
+
 ```python
 from audio_intelligence.models import ListeningSession, AcousticEvent
 from audio_intelligence.config import get_config
 ```
 
 **MVP validation point**: After T023 (US1 complete) - verify listening session works:
+
 ```bash
 audio-intelligence listen --duration 30 --record-events
 # Generate test sounds (clap, whistle)

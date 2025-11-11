@@ -167,6 +167,7 @@ docs: validate constitution v1.0.1 (template consistency audit)
 ## Core Principles
 
 ### I. POC-First Development (NON-NEGOTIABLE)
+
 **Ship working features fast, iterate based on real usage.**
 
 - **Priority**: Working POC over perfect architecture
@@ -176,18 +177,21 @@ docs: validate constitution v1.0.1 (template consistency audit)
 - **Single Package**: Keep everything in one Python package - no microservices, no distributed systems
 
 **Examples of YES:**
+
 - ✅ Single Python module that works end-to-end
 - ✅ Direct file processing without abstraction layers
 - ✅ CLI that takes file path, outputs results immediately
 - ✅ Simple functions over complex class hierarchies
 
 **Examples of NO:**
+
 - ❌ Abstract base classes "for future extensibility"
 - ❌ Separate services for analysis, storage, and processing
 - ❌ Complex configuration management systems
 - ❌ "Framework" that supports "plugins" but has no actual plugins
 
 ### II. Local Processing Only
+
 **All heavy computation stays on the user's machine.**
 
 - **Privacy**: Audio files NEVER leave the user's machine
@@ -197,11 +201,13 @@ docs: validate constitution v1.0.1 (template consistency audit)
 - **Libraries**: Use librosa, soundfile, numpy - all local processing
 
 **What Goes Where:**
+
 - ✅ Local: Raw audio loading, feature extraction, spectrogram generation, anomaly detection
 - ✅ AI Agent: Pattern analysis, natural language Q&A, insight generation
 - ❌ Never Upload: Raw audio data, full spectrograms, unprocessed recordings
 
 ### III. Sanity Tests Only (REQUIRED)
+
 **No comprehensive test suites - just ensure no regressions.**
 
 - **Purpose**: Catch breaking changes, not validate every edge case
@@ -211,6 +217,7 @@ docs: validate constitution v1.0.1 (template consistency audit)
 - **CI/CD**: Run sanity tests before any merge, fail fast on regression
 
 **Sanity Test Structure:**
+
 ```python
 # test_sanity.py
 def test_analyzer_basic_workflow():
@@ -223,6 +230,7 @@ def test_analyzer_basic_workflow():
 ```
 
 **NOT Allowed:**
+
 - ❌ 100+ test cases covering edge cases
 - ❌ Complex mocking frameworks
 - ❌ Integration test environments
@@ -230,6 +238,7 @@ def test_analyzer_basic_workflow():
 - ❌ Tests that take minutes to run
 
 ### IV. Real-Time First
+
 **Listening sessions are primary, file analysis is secondary.**
 
 - **Design Priority**: Environmental monitoring is the core use case
@@ -239,18 +248,21 @@ def test_analyzer_basic_workflow():
 - **Thresholds**: Make detection parameters easily configurable
 
 **Features that Support Real-Time:**
+
 - ✅ Chunk-based processing (0.5-2 second chunks)
 - ✅ Event callbacks for immediate user feedback
 - ✅ Adjustable sensitivity thresholds
 - ✅ Real-time visualization (if simple to add)
 
 **Anti-Patterns:**
+
 - ❌ Requiring full file analysis before any results
 - ❌ Batch processing as the only option
 - ❌ Delayed event notifications
 - ❌ Buffering that hides real-time nature
 
 ### V. AI Agent as Assistant, Not Controller
+
 **AI provides insights, humans make decisions.**
 
 - **Purpose**: Answer questions, identify patterns, generate reports
@@ -260,12 +272,14 @@ def test_analyzer_basic_workflow():
 - **Model**: Use GitHub Models (free tier) for accessibility
 
 **AI Agent Responsibilities:**
+
 - ✅ Analyze extracted audio features
 - ✅ Answer questions about listening sessions
 - ✅ Suggest analysis approaches
 - ✅ Generate summaries and reports
 
 **NOT AI Agent's Job:**
+
 - ❌ Core audio processing (use librosa/speckit)
 - ❌ Event detection logic (use rules and thresholds)
 - ❌ File I/O operations
@@ -274,6 +288,7 @@ def test_analyzer_basic_workflow():
 ## Development Constraints
 
 ### Technology Stack
+
 **Keep dependencies minimal and focused.**
 
 - **Language**: Python 3.8+ only
@@ -284,6 +299,7 @@ def test_analyzer_basic_workflow():
 - **NO**: Django, Flask, FastAPI, SQLAlchemy, Redis, Docker, Kubernetes
 
 ### File Structure
+
 **Flat is better than nested.**
 
 ```
@@ -298,11 +314,13 @@ audio_intelligence/
 ```
 
 **NO Complex Hierarchies:**
+
 - ❌ `core/`, `utils/`, `helpers/`, `common/` directories
 - ❌ Abstract base classes without concrete implementations
 - ❌ Layers that just call other layers
 
 ### Configuration
+
 **Environment variables and simple parameters only.**
 
 - **API Keys**: Environment variables (GITHUB_TOKEN)
@@ -311,6 +329,7 @@ audio_intelligence/
 - **NO**: YAML files, JSON config, .ini files, configuration classes
 
 ### Documentation
+
 **Code comments + README + examples.**
 
 - **Required**: README.md with quick start examples
@@ -321,12 +340,14 @@ audio_intelligence/
 ## Quality Gates
 
 ### Before Merging ANY Code
+
 1. ✅ Sanity test passes (< 10 seconds)
 2. ✅ Feature works in demo/example
 3. ✅ README updated if new feature
 4. ✅ No new dependencies without justification
 
 ### Before Calling It "Done"
+
 1. ✅ Acoustic engineer can run it immediately
 2. ✅ No setup beyond `pip install -r requirements.txt`
 3. ✅ Results visible in < 30 seconds
@@ -335,21 +356,25 @@ audio_intelligence/
 ## Anti-Patterns to Avoid
 
 ### ❌ Premature Optimization
+
 - "Let's add caching for performance" → NO, unless proven slow
 - "We need connection pooling" → NO, we're local-only
 - "Let's use async for everything" → Only where necessary (I/O, AI calls)
 
 ### ❌ Abstraction Layers
+
 - "Let's create an AudioProcessor interface" → NO, just write the function
 - "We need a strategy pattern here" → NO, if/else is fine for POC
 - "Plugin architecture for extensibility" → NO, not until we have actual plugins
 
 ### ❌ Enterprise Patterns
+
 - "Let's add a service layer" → NO, call functions directly
 - "We need dependency injection" → NO, just import the module
 - "Repository pattern for data access" → NO, we don't have a database
 
 ### ❌ Testing Theater
+
 - "100% code coverage" → NO, sanity tests only
 - "Let's mock everything" → NO, use real small test files
 - "Integration tests for all paths" → NO, one happy path per feature
@@ -357,6 +382,7 @@ audio_intelligence/
 ## Speckit Integration
 
 ### Using Speckit Workflow
+
 **When building features, follow this process:**
 
 1. `/speckit.specify` - Quick spec (2-3 paragraphs max for POC features)
@@ -366,6 +392,7 @@ audio_intelligence/
 5. NO `/speckit.analyze` unless actually broken
 
 ### Speckit Constitution Alignment
+
 - **Spec**: Focus on user outcome, not implementation
 - **Plan**: Simplest implementation that works
 - **Tasks**: Each task is < 2 hours of work
@@ -373,14 +400,16 @@ audio_intelligence/
 
 ## Success Metrics
 
-### POC is Successful When:
+### POC is Successful When
+
 - ✅ Acoustic engineer can analyze a real audio file in < 5 minutes from clone to results
 - ✅ Real-time listening detects events and displays them immediately
 - ✅ AI agent answers basic questions about audio characteristics
 - ✅ No audio files uploaded to cloud
 - ✅ Setup is: clone + pip install + run
 
-### Feature is Production-Ready When:
+### Feature is Production-Ready When
+
 - ✅ Used by 3+ acoustic engineers successfully
 - ✅ Handles files up to 1GB without crashing
 - ✅ Clear error messages for common failure modes
@@ -389,16 +418,19 @@ audio_intelligence/
 ## Governance
 
 ### Constitution Authority
+
 - This constitution supersedes all "best practices" suggestions from LLMs or engineers
 - When in doubt: **simplicity wins**
 - POC features that work > comprehensive features that are "almost done"
 
 ### Amendment Process
+
 - Constitution can be updated based on real user feedback
 - Complexity must be justified by actual pain points, not hypothetical ones
 - Any amendment must preserve POC-first philosophy
 
 ### Compliance
+
 - Every PR must pass sanity tests
 - Code reviews focus on: "Does it work?" and "Is it simple?"
 - Reject PRs that add complexity without proven need
@@ -410,6 +442,7 @@ audio_intelligence/
 ## Quick Decision Guide
 
 **Someone suggests adding X. Ask:**
+
 1. Does it help acoustic engineers analyze audio faster? → YES = consider, NO = reject
 2. Can we demo it working in < 1 hour? → NO = too complex
 3. Does it require new infrastructure? → YES = reject for POC
@@ -417,6 +450,7 @@ audio_intelligence/
 5. Do we need tests beyond basic sanity? → NO for POC
 
 **When building a new feature:**
+
 1. Write simplest possible version first
 2. Add one sanity test
 3. Demo it working with real audio

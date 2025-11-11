@@ -34,6 +34,7 @@ audio-intelligence --version
 ```
 
 Expected output:
+
 ```
 Audio Intelligence Tool v1.0.0
 ```
@@ -66,12 +67,14 @@ audio-intelligence listen --duration 30 --record-events
 ```
 
 **What happens**:
+
 1. Tool captures microphone input in 1-second chunks
 2. First 10 seconds establish baseline (room tone)
 3. Detects events: loud sounds, frequency shifts, silence
 4. Saves 2-second audio clips of interesting events
 
 **Output example**:
+
 ```
 🎧 Listening Session Started
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -96,11 +99,13 @@ Summary:
 ### Troubleshooting
 
 **"Microphone permission denied"**:
+
 - **macOS**: System Preferences → Security & Privacy → Microphone → Allow Terminal
 - **Linux**: Check `pavucontrol` or `alsamixer` permissions
 - **Windows**: Settings → Privacy → Microphone → Allow desktop apps
 
 **"No audio device found"**:
+
 ```bash
 # List available devices
 audio-intelligence listen --list-devices
@@ -130,6 +135,7 @@ audio-intelligence analyze --file /path/to/your/recording.wav
 ### Step 2: View Results
 
 **Output example**:
+
 ```
 Audio Analysis: events/event_001.wav
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -163,6 +169,7 @@ audio-intelligence analyze --file events/event_001.wav --output results.json
 ```
 
 View the JSON:
+
 ```bash
 cat results.json | python -m json.tool
 ```
@@ -178,6 +185,7 @@ audio-intelligence analyze --file events/event_001.wav --interactive
 ```
 
 **Example conversation**:
+
 ```
 Analysis complete. Enter 'help' for commands or ask a question.
 
@@ -201,6 +209,7 @@ AI: To prevent clipping in future recordings:
 ```
 
 **Interactive commands**:
+
 - Ask any question about the audio
 - `summary` - Re-display analysis
 - `export <path>` - Export to JSON
@@ -248,6 +257,7 @@ audio-intelligence analyze --help
 ### Configuration
 
 **Environment Variables**:
+
 ```bash
 # AI features (optional)
 export GITHUB_TOKEN="your_token_here"
@@ -294,6 +304,7 @@ audio-intelligence listen --output-dir "./my_study_001" --record-events
 ```
 
 This creates:
+
 ```
 my_study_001/
 ├── event_001.wav
@@ -307,12 +318,14 @@ my_study_001/
 ## Use Cases
 
 **1. Acoustic Environment Studies**:
+
 ```bash
 # Monitor office for 1 hour, save all events
 audio-intelligence listen --duration 3600 --record-events --output-dir office_study
 ```
 
 **2. Audio Quality Check**:
+
 ```bash
 # Analyze recording, export report
 audio-intelligence analyze -f interview.wav -o interview_qa.json
@@ -322,6 +335,7 @@ cat interview_qa.json | jq '.anomalies'
 ```
 
 **3. Batch Validation**:
+
 ```bash
 # Check 100 recordings for quality issues
 audio-intelligence batch -f "recordings/*.wav" -o validation_report.json
@@ -337,6 +351,7 @@ cat validation_report.json | jq '.results[] | select(.anomalies | length > 0)'
 ### Issue: Analysis takes too long
 
 **Solution**: Disable AI features for faster processing:
+
 ```bash
 audio-intelligence analyze --file large.wav --no-ai
 ```
@@ -344,6 +359,7 @@ audio-intelligence analyze --file large.wav --no-ai
 ### Issue: Out of memory
 
 **Solution**: File too large (>2 GB unsupported in POC):
+
 ```bash
 # Split file with ffmpeg
 ffmpeg -i large.wav -f segment -segment_time 1800 -c copy part_%03d.wav
@@ -355,6 +371,7 @@ audio-intelligence batch --files "part_*.wav"
 ### Issue: AI insights not working
 
 **Checklist**:
+
 1. Token set? `echo $GITHUB_TOKEN`
 2. Token valid? Test with: `curl -H "Authorization: Bearer $GITHUB_TOKEN" https://models.inference.ai.azure.com/chat/completions`
 3. Quota exceeded? Wait or use new token
@@ -388,6 +405,7 @@ Based on Constitution success criteria:
 This is a **Proof of Concept** with focused scope:
 
 ✅ **Supported**:
+
 - Real-time monitoring (single-threaded)
 - File analysis (WAV, MP3, FLAC via librosa)
 - AI natural language insights (optional)
@@ -395,6 +413,7 @@ This is a **Proof of Concept** with focused scope:
 - Local processing only (<1 KB feature vectors to AI)
 
 ❌ **Not Supported** (intentionally out of scope):
+
 - Parallel batch processing
 - Persistent database storage
 - Multi-user or client-server deployment
@@ -406,6 +425,7 @@ For production features, see `specs/001-audio-intelligence-poc/spec.md` (Future 
 ---
 
 **Congratulations!** You've completed the quickstart. You can now:
+
 - ✅ Monitor live audio environments
 - ✅ Analyze audio files for features and anomalies
 - ✅ Get AI-powered insights and recommendations

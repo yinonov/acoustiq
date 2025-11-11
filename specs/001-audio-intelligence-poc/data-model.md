@@ -15,6 +15,7 @@ The system manages four primary entities for audio analysis and monitoring. All 
 **Purpose**: Represents a real-time monitoring period with detected events
 
 **Attributes**:
+
 - `session_id`: str (UUID) - Unique identifier
 - `start_time`: datetime - Session start timestamp
 - `end_time`: datetime | None - Session end timestamp (None if active)
@@ -32,14 +33,17 @@ The system manages four primary entities for audio analysis and monitoring. All 
 - `chunk_count`: int - Total audio chunks processed
 
 **Relationships**:
+
 - One-to-many with AcousticEvent (session contains multiple events)
 
 **State Transitions**:
+
 1. INITIALIZING → Baseline calculation (first 10 chunks)
 2. MONITORING → Active event detection
 3. COMPLETED → Session ended, summary generated
 
 **Validation Rules**:
+
 - `sample_rate` must be > 0 (typically 16000-48000)
 - `chunk_size` must correspond to 0.5-2 seconds of audio
 - `volume_threshold` typically 5-20 dB
@@ -47,6 +51,7 @@ The system manages four primary entities for audio analysis and monitoring. All 
 - `baseline_*` computed from first 10 chunks
 
 **Persistence**:
+
 - In-memory during session
 - Optionally saved as `session_{id}_summary.json` on completion
 - JSON format includes all attributes + event list
@@ -56,6 +61,7 @@ The system manages four primary entities for audio analysis and monitoring. All 
 **Purpose**: Represents a detected occurrence during listening
 
 **Attributes**:
+
 - `event_id`: str (UUID) - Unique identifier
 - `session_id`: str - Parent session reference
 - `timestamp`: datetime - When event detected
@@ -69,6 +75,7 @@ The system manages four primary entities for audio analysis and monitoring. All 
 - `metadata`: Dict[str, Any] - Additional event-specific data
 
 **EventType Enum**:
+
 - `VOLUME_INCREASE` - Sudden volume spike
 - `VOLUME_DECREASE` - Sudden volume drop
 - `FREQUENCY_SHIFT` - Significant frequency content change
@@ -77,16 +84,19 @@ The system manages four primary entities for audio analysis and monitoring. All 
 - `SILENCE` - Extended silence period
 
 **Relationships**:
+
 - Many-to-one with ListeningSession (event belongs to one session)
 - Optional reference to audio clip file on disk
 
 **Validation Rules**:
+
 - `magnitude` must be > 0
 - `frequency_range[0]` < `frequency_range[1]` if present
 - `relative_time` >= 0
 - `audio_clip_path` must exist if specified
 
 **Persistence**:
+
 - In-memory in session's event list
 - Included in session summary JSON
 - Optional 2-second audio clip as `event_{id}.wav` file
@@ -96,6 +106,7 @@ The system manages four primary entities for audio analysis and monitoring. All 
 **Purpose**: Output of file analysis with extracted features and anomalies
 
 **Attributes**:
+
 - `file_path`: Path - Source audio file
 - `file_size_bytes`: int - File size for validation
 - `duration_seconds`: float - Audio duration
@@ -109,6 +120,7 @@ The system manages four primary entities for audio analysis and monitoring. All 
 - `timestamp`: datetime - When analysis performed
 
 **BasicFeatures**:
+
 - `rms_energy`: float - Root mean square energy
 - `peak_amplitude`: float - Maximum amplitude value
 - `frequency_spectrum`: np.ndarray - FFT magnitude spectrum
@@ -116,6 +128,7 @@ The system manages four primary entities for audio analysis and monitoring. All 
 - `zero_crossing_rate`: float - Rate of sign changes
 
 **AdvancedFeatures**:
+
 - `mfccs`: np.ndarray - Mel-frequency cepstral coefficients (13 coefficients)
 - `chroma`: np.ndarray - Chromagram (12 pitch classes)
 - `spectral_contrast`: np.ndarray - Spectral valley-peak contrast
@@ -123,12 +136,14 @@ The system manages four primary entities for audio analysis and monitoring. All 
 - `spectral_bandwidth`: float - Weighted std of frequencies
 
 **Anomaly**:
+
 - `type`: AnomalyType - Classification
 - `severity`: float - 0.0-1.0 scale
 - `time_range`: Tuple[float, float] - (start_sec, end_sec)
 - `description`: str - Human-readable explanation
 
 **AnomalyType Enum**:
+
 - `CLIPPING` - Samples near ±1.0
 - `DC_OFFSET` - Non-zero mean
 - `SILENCE` - Extended low-energy periods
@@ -136,10 +151,12 @@ The system manages four primary entities for audio analysis and monitoring. All 
 - `DYNAMIC_RANGE_HIGH` - Unusual amplitude variation
 
 **Relationships**:
+
 - References source file on disk
 - Optionally references AI agent for insights
 
 **Validation Rules**:
+
 - `file_size_bytes` must match actual file size
 - `duration_seconds` > 0
 - `channels` in [1, 2]
@@ -147,6 +164,7 @@ The system manages four primary entities for audio analysis and monitoring. All 
 - File must exist and be readable
 
 **Persistence**:
+
 - Not persisted by default (computed on-demand)
 - Optionally exported as JSON via `--output` flag
 - AI insights cached in-memory for interactive session
@@ -156,6 +174,7 @@ The system manages four primary entities for audio analysis and monitoring. All 
 **Purpose**: Compact representation for AI analysis (<1KB)
 
 **Attributes**:
+
 - `source_type`: SourceType - Whether from file or session
 - `source_id`: str - File path or session ID
 - `summary_stats`: SummaryStats - Aggregate metrics
@@ -164,6 +183,7 @@ The system manages four primary entities for audio analysis and monitoring. All 
 - `size_bytes`: int - Actual size for validation (<1024)
 
 **SummaryStats**:
+
 - `mean_rms`: float - Average energy
 - `std_rms`: float - Energy standard deviation
 - `peak_rms`: float - Maximum energy
@@ -171,6 +191,7 @@ The system manages four primary entities for audio analysis and monitoring. All 
 - `std_centroid`: float - Centroid standard deviation
 
 **Frequency Bands** (energy in each):
+
 - Sub-bass: 20-60 Hz
 - Bass: 60-250 Hz
 - Low-mid: 250-500 Hz
@@ -181,21 +202,25 @@ The system manages four primary entities for audio analysis and monitoring. All 
 - Air: 20000+ Hz (if sample rate supports)
 
 **TemporalPattern**:
+
 - `attack_rate`: float - How quickly sound emerges
 - `sustain_level`: float - Average sustained level
 - `decay_rate`: float - How quickly sound fades
 - `event_density`: float - Events per second
 
 **Relationships**:
+
 - Derived from Audio Analysis Result or Listening Session
 - Sent to AI Agent (not persisted locally)
 
 **Validation Rules**:
+
 - `size_bytes` MUST be < 1024 (hard requirement from spec)
 - All floats must be finite (no NaN/Inf)
 - `frequency_bands` length = 8
 
 **Persistence**:
+
 - Never persisted locally (ephemeral for AI calls)
 - Transmitted via HTTPS to GitHub Models API
 - Discarded after AI response received
@@ -223,6 +248,7 @@ AudioAnalysisResult
 ## Data Flow
 
 ### Real-Time Listening (P1)
+
 1. Create ListeningSession with configuration
 2. Capture audio chunk (sounddevice callback)
 3. Compute baseline (first 10 chunks)
@@ -235,6 +261,7 @@ AudioAnalysisResult
 5. On session end → Generate summary JSON
 
 ### File Analysis (P2)
+
 1. Validate file exists and size < 2GB
 2. Load audio with librosa
 3. Create AudioAnalysisResult
@@ -245,6 +272,7 @@ AudioAnalysisResult
 8. Optionally export to JSON
 
 ### AI Insights (P3)
+
 1. From AudioAnalysisResult or ListeningSession
 2. Create FeatureVector (compress to <1KB)
 3. Send to AI Agent via GitHub Models API
@@ -255,11 +283,13 @@ AudioAnalysisResult
 ## State Management
 
 **In-Memory State**:
+
 - Active ListeningSession during real-time monitoring
 - Current AudioAnalysisResult during file analysis
 - AI agent instance (singleton, reused across queries)
 
 **Disk State**:
+
 - Audio recordings: `{output_dir}/event_{id}.wav` (2-second clips)
 - Session summaries: `{output_dir}/session_{id}_summary.json`
 - Analysis exports: `{output_path}` (JSON format)
@@ -269,17 +299,20 @@ AudioAnalysisResult
 ## Validation & Constraints
 
 ### File Size Limits
+
 - Maximum file size: 2GB (FR-022)
 - Check before loading to prevent OOM
 - Display clear error with splitting suggestion
 
 ### Memory Constraints
+
 - Audio chunks: Released after processing (no accumulation)
 - Event list: Grows with events but metadata only (~100 bytes/event)
 - Feature vectors: <1KB guaranteed
 - Expected memory: <100MB typical, <2GB maximum (SC-004)
 
 ### Data Integrity
+
 - All file paths validated before access
 - Sample rates validated (typically 8kHz-96kHz)
 - Float values checked for NaN/Inf
@@ -288,6 +321,7 @@ AudioAnalysisResult
 ## Example Data Structures
 
 ### Listening Session Summary JSON
+
 ```json
 {
   "session_id": "550e8400-e29b-41d4-a716-446655440000",
@@ -310,6 +344,7 @@ AudioAnalysisResult
 ```
 
 ### Analysis Result JSON
+
 ```json
 {
   "file_path": "/path/to/recording.wav",

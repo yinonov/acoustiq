@@ -26,20 +26,24 @@ Available for all commands:
 **Purpose**: Analyze a single audio file for features and anomalies
 
 **Usage**:
+
 ```bash
 audio-intelligence analyze --file <path> [options]
 ```
 
 **Required Arguments**:
+
 - `--file, -f PATH` - Path to audio file (WAV, MP3, FLAC)
 
 **Optional Arguments**:
+
 - `--output, -o PATH` - Export results to JSON file
 - `--format {text|json}` - Output format (default: text)
 - `--ai/--no-ai` - Enable/disable AI insights (default: auto-detect token)
 - `--interactive, -i` - Enter interactive Q&A mode after analysis
 
 **Output** (text format):
+
 ```
 Audio Analysis: /path/to/file.wav
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -74,6 +78,7 @@ Analysis completed in 2.3 seconds
 ```
 
 **Output** (JSON format):
+
 ```json
 {
   "file_path": "/path/to/file.wav",
@@ -108,6 +113,7 @@ Analysis completed in 2.3 seconds
 ```
 
 **Exit Codes**:
+
 - `0` - Success
 - `1` - File not found or unreadable
 - `2` - File format not supported
@@ -115,6 +121,7 @@ Analysis completed in 2.3 seconds
 - `4` - Analysis error
 
 **Examples**:
+
 ```bash
 # Basic analysis
 audio-intelligence analyze --file recording.wav
@@ -136,11 +143,13 @@ audio-intelligence analyze -f recording.wav --quiet --format json
 **Purpose**: Monitor live microphone input and detect acoustic events
 
 **Usage**:
+
 ```bash
 audio-intelligence listen [options]
 ```
 
 **Optional Arguments**:
+
 - `--duration, -d SECONDS` - How long to listen (default: 60)
 - `--output-dir, -o PATH` - Directory for event recordings (default: ./events)
 - `--record-events` - Save 2-second audio clips of detected events
@@ -151,6 +160,7 @@ audio-intelligence listen [options]
 - `--list-devices` - Show available audio devices and exit
 
 **Output** (live updates):
+
 ```
 🎧 Listening Session Started
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -193,6 +203,7 @@ Session summary saved: events/session_550e8400_summary.json
 ```
 
 **Exit Codes**:
+
 - `0` - Success
 - `1` - No audio device available
 - `2` - Microphone permission denied
@@ -200,6 +211,7 @@ Session summary saved: events/session_550e8400_summary.json
 - `4` - Keyboard interrupt (Ctrl+C) - graceful shutdown
 
 **Examples**:
+
 ```bash
 # Basic 60-second session
 audio-intelligence listen
@@ -221,20 +233,24 @@ audio-intelligence listen --list-devices
 **Purpose**: Process multiple audio files sequentially
 
 **Usage**:
+
 ```bash
 audio-intelligence batch --files <pattern> [options]
 ```
 
 **Required Arguments**:
+
 - `--files, -f PATTERN` - File pattern (glob) or space-separated paths
 
 **Optional Arguments**:
+
 - `--output, -o PATH` - Export aggregated results to JSON file
 - `--format {text|json}` - Output format (default: text)
 - `--continue-on-error` - Skip corrupted files, continue processing (default: true)
 - `--parallel` - Process files in parallel (NOT IMPLEMENTED in POC)
 
 **Output** (text format):
+
 ```
 Batch Analysis: 3 files
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -266,12 +282,14 @@ Results exported: batch_results.json
 ```
 
 **Exit Codes**:
+
 - `0` - All files processed successfully
 - `1` - Some files failed (with --continue-on-error)
 - `2` - All files failed
 - `3` - No files matched pattern
 
 **Examples**:
+
 ```bash
 # Analyze all WAV files in directory
 audio-intelligence batch --files "*.wav"
@@ -299,6 +317,7 @@ The tool respects the following environment variables:
 ### Common Error Patterns
 
 **Microphone Permission Denied**:
+
 ```
 ❌ Error: Microphone permission denied
 
@@ -311,6 +330,7 @@ After granting permission, restart the application.
 ```
 
 **File Too Large**:
+
 ```
 ❌ Error: File exceeds maximum size limit
 
@@ -322,6 +342,7 @@ Suggestion: Split file into smaller chunks:
 ```
 
 **AI Token Invalid**:
+
 ```
 ⚠️  Warning: AI features unavailable
 
@@ -336,6 +357,7 @@ Continuing with raw analysis features...
 ```
 
 **Corrupted File**:
+
 ```
 ❌ Error: Unable to read audio file
 
@@ -371,6 +393,7 @@ Exiting interactive mode. Goodbye!
 ```
 
 **Interactive Commands**:
+
 - `help` - Show available commands
 - `summary` - Re-display analysis summary
 - `export <path>` - Export current analysis to JSON
@@ -389,6 +412,7 @@ sounddevice: 0.4.6
 ## Sanity Test Coverage
 
 The CLI interface is tested with:
+
 - `test_cli_imports()` - Verify all commands discoverable
 - `test_cli_help()` - Ensure --help works for all commands
 - Manual smoke test: `audio-intelligence analyze --file test.wav` completes successfully
