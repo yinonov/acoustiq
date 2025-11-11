@@ -138,6 +138,9 @@ dmypy.json
 
 # Analysis results
 results/
+session_data/
+recordings/
+test_batch*/
 *.json
 analysis_*.txt
 
