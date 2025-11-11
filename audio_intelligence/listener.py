@@ -14,12 +14,26 @@ import queue
 from datetime import datetime
 import json
 
-try:
-    import sounddevice as sd
-    import soundfile as sf
-    AUDIO_INPUT_AVAILABLE = True
-except ImportError:
-    AUDIO_INPUT_AVAILABLE = False
+AUDIO_INPUT_AVAILABLE = False
+sd = None
+sf = None
+
+def _check_audio_imports():
+    """Lazy import of audio dependencies."""
+    global AUDIO_INPUT_AVAILABLE, sd, sf
+    if AUDIO_INPUT_AVAILABLE:
+        return True
+    
+    try:
+        import sounddevice as _sd
+        import soundfile as _sf
+        sd = _sd
+        sf = _sf
+        AUDIO_INPUT_AVAILABLE = True
+        return True
+    except (ImportError, OSError) as e:
+        # OSError occurs when PortAudio is not installed
+        return False
 
 from .analyzer import AudioAnalyzer
 
@@ -51,9 +65,10 @@ class EnvironmentListener:
             device: Audio input device ID (None for default)
             agent_enabled: Whether to enable AI agent for analysis
         """
-        if not AUDIO_INPUT_AVAILABLE:
+        if not _check_audio_imports():
             raise ImportError("sounddevice and soundfile required for real-time monitoring. "
-                            "Install with: pip install sounddevice soundfile")
+                            "Install with: pip install sounddevice soundfile\n"
+                            "Note: sounddevice requires PortAudio library to be installed on your system.")
         
         self.sample_rate = sample_rate
         self.chunk_duration = chunk_duration
